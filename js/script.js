@@ -37,6 +37,7 @@ function getCountryList() {
 }
 
 function init() {
+  map.on("click", onMapClick);
   map.on("locationfound", onLocationFound);
   map.on("locationerror", onLocationError);
   L.control
@@ -128,6 +129,10 @@ function init() {
     .addTo(map);
 }
 
+function onLocationError(e) {
+  alert(e.message);
+}
+
 function onLocationFound(e) {
   const lat = e.latlng.lat;
   const lng = e.latlng.lng;
@@ -135,8 +140,11 @@ function onLocationFound(e) {
   console.log(lat, lng);
 }
 
-function onLocationError(e) {
-  alert(e.message);
+function onMapClick(e) {
+  const lat = e.latlng.lat % 90;
+  const lng = e.latlng.lng > 180 ? e.latlng.lng - 360 : e.latlng.lng;
+  // getCountry({ lat, lng });
+  console.log(lat, lng);
 }
 
 function validateCountry(country) {
