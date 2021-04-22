@@ -48,11 +48,18 @@ function getCountry()
     $opencage = json_decode($opencage);
     if (($status = $opencage->status->code ?? null) && $status === 200 && ($result = $opencage->results[0] ?? null)) {
         if ($countryCode = $result->components->country_code ?? null) {
-            $countryCode = strtoupper($countryCode);
-            $result->components->country_code = $countryCode;
-            $result->components->country = ($countryCode === "CI") ? "Ivory Coast" : $result->components->country;
-            $result->components->country = ($result->components->country === "Somaliland") ? "Somalia" : $result->components->country;
+            $result->components->country_code = strtoupper($countryCode);
+
+            if ($result->components->country_code === "CI") {
+                $result->components->country = "Ivory Coast";
+            } else if ($result->components->country_code === "XK") {
+                $result->components->country = "Kosovo";
+            } elseif ($result->components->country === "Somaliland") {
+                $result->components->country = "Somalia";
+            }
+
             $country = $country ?? $result->components->country;
+            $countryCode = $result->components->country_code;
 
             if ($borders = getBorders($countryCode) ?? null) {
                 $output->borders = $borders;
