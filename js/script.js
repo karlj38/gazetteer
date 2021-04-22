@@ -99,6 +99,13 @@ function init() {
   };
   map.fitWorld();
   L.control.zoom({ position: "topright" }).addTo(map);
+  L.easyButton(
+    "fa-location-arrow",
+    function () {
+      map.locate();
+    },
+    { position: "topright" }
+  ).addTo(map);
   L.control.layers(baseLayers).addTo(map);
   L.Control.CountryList = L.Control.extend({
     onAdd: function () {
