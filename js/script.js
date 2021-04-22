@@ -16,8 +16,30 @@ window.infoButton = null;
 
 $(function () {
   init();
-  getCountryList();
 });
+
+function addCountryListControl() {
+  L.Control.CountryList = L.Control.extend({
+    onAdd: function () {
+      $select = $(
+        '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="validateCountry(this.value)"></select>'
+      );
+      $select.append(
+        '<option value="" disabled selected>Select a country</option>'
+      );
+      return $select.get(0);
+    },
+  });
+  L.control.countryList = function (opts) {
+    return new L.Control.CountryList(opts);
+  };
+  L.control
+    .countryList({
+      position: "topleft",
+    })
+    .addTo(map);
+  L.DomEvent.disableClickPropagation($("#countryList").get(0));
+}
 
 function checkURLHash() {
   if (location.hash) {
@@ -157,6 +179,8 @@ function init() {
     Night: night,
   };
   map.fitWorld();
+  addCountryListControl();
+  getCountryList();
   L.control.zoom({ position: "topright" }).addTo(map);
   L.easyButton(
     "fa-location-arrow",
@@ -166,26 +190,6 @@ function init() {
     { position: "topright" }
   ).addTo(map);
   L.control.layers(baseLayers).addTo(map);
-  L.Control.CountryList = L.Control.extend({
-    onAdd: function () {
-      $select = $(
-        '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="validateCountry(this.value)"></select>'
-      );
-      $select.append(
-        '<option value="" disabled selected>Select a country</option>'
-      );
-      return $select.get(0);
-    },
-  });
-  L.control.countryList = function (opts) {
-    return new L.Control.CountryList(opts);
-  };
-  L.control
-    .countryList({
-      position: "topleft",
-    })
-    .addTo(map);
-  L.DomEvent.disableClickPropagation($("#countryList").get(0));
 }
 
 function onLocationError(e) {
