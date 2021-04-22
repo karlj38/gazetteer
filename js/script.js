@@ -27,6 +27,30 @@ function checkURLHash() {
   }
 }
 
+function displayBorders() {
+  const data = countryData.borders.geometry;
+  let borders = [];
+  if (data.type === "MultiPolygon") {
+    data.coordinates.forEach((poly) => {
+      let coords = [];
+      poly[0].forEach((coord) => {
+        const lat = coord[1];
+        const lng = coord[0];
+        coords.push([lat, lng]);
+      });
+      borders.push(coords);
+    });
+  } else {
+    data.coordinates[0].forEach((coord) => {
+      const lng = coord[0];
+      const lat = coord[1];
+      borders.push([lat, lng]);
+    });
+  }
+  map.fitBounds(borders);
+  window.borders = L.polygon(borders).addTo(map);
+}
+
 function getCountry({ countryName, lat, lng }) {
   resetMap();
   let params = { get: "country" };
@@ -45,6 +69,9 @@ function getCountry({ countryName, lat, lng }) {
     window.countryData = data;
     document.title = `Gazetteer | ${window.countryName}`;
     location.hash = window.countryName;
+    if (data.borders) {
+      displayBorders();
+    }
   });
 }
 
