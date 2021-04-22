@@ -16,6 +16,13 @@ $(function () {
   getCountryList();
 });
 
+function checkURLHash() {
+  if (location.hash) {
+    hash = decodeURI(location.hash.substring(1));
+    validateCountry(hash);
+  }
+}
+
 function getCountryList() {
   $.getJSON("php/api", { get: "countryList" }, function (data, status) {
     data.forEach((country) => {
@@ -24,7 +31,7 @@ function getCountryList() {
         `<option id="${id}" value="${country[0]}" data="${country[1]}">${country[0]}</option>`
       );
     });
-  });
+  }).then(checkURLHash);
 }
 
 function init() {
@@ -92,7 +99,7 @@ function init() {
   L.Control.CountryList = L.Control.extend({
     onAdd: function (map) {
       $select = $(
-        '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="console.log(this.value)"></select>'
+        '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="validateCountry(this.value)"></select>'
       );
       $select.append(
         '<option value="" disabled selected>Select a country</option>'
@@ -108,4 +115,16 @@ function init() {
       position: "topleft",
     })
     .addTo(map);
+}
+
+function validateCountry(country) {
+  const countryId = country.replace(/ /g, "-");
+  if ($(`#${countryId}`).length) {
+    window.countryName = country;
+    window.countryCode = $(`#${countryId}`).attr("data");
+    // getCountry({ countryName });
+    console.log(countryName, countryCode);
+  } else {
+    alert("Not a valid country");
+  }
 }
