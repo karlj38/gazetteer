@@ -7,9 +7,11 @@ window.map = L.map("map", {
   ],
   zoomControl: false,
 });
-window.countryMarker = L.marker();
 window.cityMarkers = L.layerGroup();
 window.mountainMarkers = L.layerGroup();
+window.countryData = null;
+window.countryName = null;
+window.countryCode = null;
 
 $(function () {
   init();
@@ -23,6 +25,27 @@ function checkURLHash() {
   } else {
     map.locate();
   }
+}
+
+function getCountry({ countryName, lat, lng }) {
+  resetMap();
+  let params = { get: "country" };
+  if (countryName) {
+    params.country = countryName;
+  } else if (lat && lng) {
+    params.lat = lat;
+    params.lng = lng;
+  }
+  $.getJSON("php/api", params, function (data, status) {
+    console.log(data);
+    if (lat && lng) {
+      window.countryName = data.opencage.components.country;
+      window.countryCode = data.opencage.components.country_code;
+    }
+    window.countryData = data;
+    document.title = `Gazetteer | ${window.countryName}`;
+    location.hash = window.countryName;
+  });
 }
 
 function getCountryList() {
@@ -136,15 +159,23 @@ function onLocationError(e) {
 function onLocationFound(e) {
   const lat = e.latlng.lat;
   const lng = e.latlng.lng;
-  // getCountry({ lat, lng });
-  console.log(lat, lng);
+  getCountry({ lat, lng });
+  //   console.log(lat, lng);
 }
 
 function onMapClick(e) {
   const lat = e.latlng.lat % 90;
   const lng = e.latlng.lng > 180 ? e.latlng.lng - 360 : e.latlng.lng;
-  // getCountry({ lat, lng });
-  console.log(lat, lng);
+  getCountry({ lat, lng });
+  //   console.log(lat, lng);
+}
+
+function resetMap() {
+  if (window.borders) {
+    map.removeLayer(borders);
+  }
+  map.removeLayer(cityMarkers);
+  map.removeLayer(mountainMarkers);
 }
 
 function validateCountry(country) {
@@ -152,8 +183,8 @@ function validateCountry(country) {
   if ($(`#${countryId}`).length) {
     window.countryName = country;
     window.countryCode = $(`#${countryId}`).attr("data");
-    // getCountry({ countryName });
-    console.log(countryName, countryCode);
+    getCountry({ countryName });
+    // console.log(countryName, countryCode);
   } else {
     alert("Not a valid country");
   }
