@@ -20,6 +20,8 @@ function checkURLHash() {
   if (location.hash) {
     hash = decodeURI(location.hash.substring(1));
     validateCountry(hash);
+  } else {
+    map.locate();
   }
 }
 
@@ -35,6 +37,8 @@ function getCountryList() {
 }
 
 function init() {
+  map.on("locationfound", onLocationFound);
+  map.on("locationerror", onLocationError);
   L.control
     .attribution({
       prefix: '<a href="https://www.leafletjs.com" target="_blank">Leaflet</a>',
@@ -97,7 +101,7 @@ function init() {
   L.control.zoom({ position: "topright" }).addTo(map);
   L.control.layers(baseLayers).addTo(map);
   L.Control.CountryList = L.Control.extend({
-    onAdd: function (map) {
+    onAdd: function () {
       $select = $(
         '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="validateCountry(this.value)"></select>'
       );
@@ -115,6 +119,17 @@ function init() {
       position: "topleft",
     })
     .addTo(map);
+}
+
+function onLocationFound(e) {
+  const lat = e.latlng.lat;
+  const lng = e.latlng.lng;
+  // getCountry({ lat, lng });
+  console.log(lat, lng);
+}
+
+function onLocationError(e) {
+  alert(e.message);
 }
 
 function validateCountry(country) {
