@@ -12,6 +12,7 @@ window.mountainMarkers = L.layerGroup();
 window.countryData = null;
 window.countryName = null;
 window.countryCode = null;
+window.infoButton = null;
 
 $(function () {
   init();
@@ -72,6 +73,13 @@ function getCountry({ countryName, lat, lng }) {
     if (data.borders) {
       displayBorders();
     }
+    window.infoButton = L.easyButton(
+      "fa-info",
+      function () {
+        $("#countryModal").modal("toggle");
+      },
+      { position: "topleft" }
+    ).addTo(map);
   });
 }
 
@@ -204,6 +212,9 @@ function resetMap() {
   }
   map.removeLayer(cityMarkers);
   map.removeLayer(mountainMarkers);
+  if (window.infoButton) {
+    window.infoButton.remove();
+  }
 }
 
 function validateCountry(country) {
