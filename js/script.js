@@ -5,6 +5,7 @@ window.map = L.map("map", {
     [-180, -180],
     [180, 180],
   ],
+  zoomControl: false,
 });
 window.countryMarker = L.marker();
 window.cityMarkers = L.layerGroup();
@@ -12,7 +13,19 @@ window.mountainMarkers = L.layerGroup();
 
 $(function () {
   init();
+  getCountryList();
 });
+
+function getCountryList() {
+  $.getJSON("php/api", { get: "countryList" }, function (data, status) {
+    data.forEach((country) => {
+      const id = country[0].replace(/ /g, "-");
+      $("#countryList").append(
+        `<option id="${id}" value="${country[0]}" data="${country[1]}">${country[0]}</option>`
+      );
+    });
+  });
+}
 
 function init() {
   L.control
@@ -74,5 +87,25 @@ function init() {
     Night: night,
   };
   map.fitWorld();
+  L.control.zoom({ position: "topright" }).addTo(map);
   L.control.layers(baseLayers).addTo(map);
+  L.Control.CountryList = L.Control.extend({
+    onAdd: function (map) {
+      $select = $(
+        '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="console.log(this.value)"></select>'
+      );
+      $select.append(
+        '<option value="" disabled selected>Select a country</option>'
+      );
+      return $select.get(0);
+    },
+  });
+  L.control.countryList = function (opts) {
+    return new L.Control.CountryList(opts);
+  };
+  L.control
+    .countryList({
+      position: "topleft",
+    })
+    .addTo(map);
 }
