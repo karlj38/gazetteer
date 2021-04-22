@@ -177,6 +177,7 @@ function init() {
       position: "topleft",
     })
     .addTo(map);
+  L.DomEvent.disableClickPropagation($("#countryList").get(0));
 }
 
 function onLocationError(e) {
