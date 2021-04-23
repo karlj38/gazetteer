@@ -52,6 +52,7 @@
                         class="nav-link active"
                         href="#nav-info"
                         data-toggle="tab"
+                        role="tab"
                         aria-controls="nav-info"
                         aria-selected="false"
                         >Info</a
@@ -60,6 +61,7 @@
                         class="nav-link"
                         href="#nav-finance"
                         data-toggle="tab"
+                        role="tab"
                         aria-controls="nav-finance"
                         aria-selected="false"
                         >Finance</a
@@ -71,7 +73,7 @@
                       class="tab-pane show active"
                       id="nav-info"
                       role="tabpanel"
-                      aria-labelledby="nav-home-tab"
+                      aria-labelledby="nav-info"
                     >
                       <table class="table table-sm table-hover">
                         <tbody id="infoTable"></tbody>
@@ -81,9 +83,35 @@
                       class="tab-pane"
                       id="nav-finance"
                       role="tabpanel"
-                      aria-labelledby="nav-profile-tab"
+                      aria-labelledby="nav-finance"
                     >
-                      Finance
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <td class="">
+                              <img
+                                id="countryCurrencyFlag"
+                                src="#"
+                                class="currencyFlag"
+                                alt=""
+                              />
+                            </td>
+                            <th
+                              id="countryCurrencyCode"
+                              scope="row"
+                              class=""
+                            ></th>
+                            <td
+                              id="countryCurrency"
+                              class="w-50 text-right"
+                            ></td>
+                          </tr>
+                        </thead>
+                        <tbody id="financeTable"></tbody>
+                      </table>
+                      <p id="ratesError" class="d-none">
+                        Exchange rate data not available.
+                      </p>
                     </div>
                   </div>
                 </div>

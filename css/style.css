@@ -5,7 +5,20 @@
 .thumbnail {
   width: 70px;
 }
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
 #infoTable td {
   text-align: right;
+}
+
+.currencyFlag {
+  width: 50px;
+  max-height: 30px;
 }

@@ -125,6 +125,41 @@ function displayBorders() {
   window.borders = L.polygon(borders).addTo(map);
 }
 
+function displayRates() {
+  const currency = countryData.opencage.annotations.currency;
+  const symbol = currency.html_entity || currency.symbol || null;
+  const code = currency.iso_code || null;
+  const name = currency.name || null;
+  const sub = currency.subunit || null;
+  let units = null;
+  if (symbol && sub) {
+    units = `(${symbol} / ${sub})`;
+  } else if (symbol && !sub) {
+    units = `(${symbol})`;
+  } else if (!symbol && sub) {
+    units = `(${sub})`;
+  }
+  const flag = code === "EUR" ? "svg\\Europe.svg" : countryData.rest.flag;
+  $("#countryCurrencyFlag").attr({ src: flag, alt: `${countryName} flag` });
+  $("#countryCurrencyCode").text(code);
+  $("#countryCurrency").html(`${name} ${units}`);
+  console.log($("#countryCurrencyFlag").html());
+  console.log($("#countryCurrencyCode").html());
+  console.log($("#countryCurrency").html());
+
+  for (const currency in countryData.rates.rates) {
+    const rate = Number(countryData.rates.rates[currency]).toFixed(3);
+    const flag = countryData.rates.flags[currency];
+    $currency = $("<tr/>");
+    $currency.append(
+      `<td><img src='${flag}' class='currencyFlag' alt="${currency} flag"></td>`
+    );
+    $currency.append(`<th scope='row' class="">${currency}</th>`);
+    $currency.append(`<td class="w-50 text-right">${rate}</td>`);
+    $("#financeTable").append($currency);
+  }
+}
+
 function formatNumber(n) {
   if (n > 10 ** 9) {
     return (n / 10 ** 9).toPrecision(2) + " billion";
@@ -157,18 +192,24 @@ function getCountry({ countryName, lat, lng }) {
     window.countryData = data;
     document.title = `Gazetteer | ${window.countryName}`;
     location.hash = window.countryName;
-    if (data.borders) {
-      displayBorders();
-    }
-    window.infoButton = L.easyButton(
-      "fa-info",
-      function () {
-        $("#countryModal").modal("toggle");
-      },
-      { position: "topleft" }
-    ).addTo(map);
+
     if (data.opencage && data.rest) {
+      if (data.borders || null) {
+        displayBorders();
+      }
       displayCountryInfo();
+      if (data.rates || null) {
+        displayRates();
+      } else {
+        $("#ratesError").toggleClass("d-none");
+      }
+      window.infoButton = L.easyButton(
+        "fa-info",
+        function () {
+          $("#countryModal").modal("toggle");
+        },
+        { position: "topleft" }
+      ).addTo(map);
     }
   });
 }
@@ -288,6 +329,7 @@ function resetMap() {
     window.infoButton.remove();
   }
   $("#infoTable").empty();
+  $("#financeTable").empty();
 }
 
 function validateCountry(country) {
