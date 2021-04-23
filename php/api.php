@@ -87,6 +87,8 @@ function getCountry()
                 $base = $result->annotations->currency->iso_code;
                 $rates = getCurrencies($base);
                 $output->rates = $rates ?? null;
+
+                $output->mountains = getGeonamesTop10("mountains", $countryCode) ?? null;
             }
             return json_encode($output);
         }
@@ -105,6 +107,44 @@ function getCountryList()
         array_push($countries, [$name, $code]);
     }
     return json_encode($countries);
+}
+
+function getGeonamesTop10($feature, $code)
+{
+    global $geonames;
+    switch ($feature) {
+        case "cities":
+            $featureClass = "P";
+            $order = "population";
+            break;
+        case "mountains":
+            $featureClass = "T";
+            $order = "elevation";
+            break;
+    }
+
+    $url = "http://api.geonames.org/searchJSON?featureClass=$featureClass&maxRows=10&orderby=$order&country=$code&style=full&username=$geonames";
+    $top10 =  json_decode(curl($url));
+    if ($top10->totalResultsCount > 0) {
+        $geonames = $top10->geonames;
+        for ($i = 0; $i < count($geonames); $i++) {
+            $geoname = $geonames[$i];
+            if ($list = $geoname->alternateNames ?? null) {
+                foreach ($list as $index => $value) {
+                    if ($value->lang === "link") {
+                        $geoname->wiki = $value->name;
+                        break;
+                    }
+                }
+            }
+            $location = $geoname->name;
+            if (!isset($geoname->wiki)) {
+                $wikiResult = json_decode(Wiki($location));
+                $top10->geonames[$i]->wiki = $wikiResult[3][0] ?? null;
+            }
+        }
+        return $top10->geonames;
+    }
 }
 
 function openCage($search)
