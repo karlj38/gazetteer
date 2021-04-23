@@ -88,7 +88,11 @@ function getCountry()
                 $rates = getCurrencies($base);
                 $output->rates = $rates ?? null;
 
-                $output->mountains = getGeonamesTop10("mountains", $countryCode) ?? null;
+                $mountains = getGeonamesTop10("mountains", $countryCode);
+                $output->mountains = $mountains;
+
+                $cities = getGeonamesTop10("cities", $countryCode);
+                $output->cities = $cities;
             }
             return json_encode($output);
         }
@@ -126,9 +130,9 @@ function getGeonamesTop10($feature, $code)
     $url = "http://api.geonames.org/searchJSON?featureClass=$featureClass&maxRows=10&orderby=$order&country=$code&style=full&username=$geonames";
     $top10 =  json_decode(curl($url));
     if ($top10->totalResultsCount > 0) {
-        $geonames = $top10->geonames;
-        for ($i = 0; $i < count($geonames); $i++) {
-            $geoname = $geonames[$i];
+        $geonamesData = $top10->geonames;
+        for ($i = 0; $i < count($geonamesData); $i++) {
+            $geoname = $geonamesData[$i];
             if ($list = $geoname->alternateNames ?? null) {
                 foreach ($list as $index => $value) {
                     if ($value->lang === "link") {
