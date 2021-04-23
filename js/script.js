@@ -125,6 +125,32 @@ function displayBorders() {
   window.borders = L.polygon(borders).addTo(map);
 }
 
+function displayMountains() {
+  let mountains = [];
+  const mountainIcon = L.ExtraMarkers.icon({
+    prefix: "fa",
+    icon: "fa-mountain",
+    markerColor: "green",
+  });
+  const data = countryData.mountains;
+  data.forEach((mountain) => {
+    const mountainMarker = L.marker([mountain.lat, mountain.lng], {
+      icon: mountainIcon,
+      title: mountain.name,
+    });
+    let details = `<h2>${mountain.name}</h2>`;
+    let elevation = mountain.elevation || null;
+    elevation = elevation ? elevation + " m" : "undefined";
+    details += `<p><strong>Elevation:</strong> ${elevation} </p>`;
+    if (mountain.wiki) {
+      details += `<p><a href="${mountain.wiki}" target="_blank">Wikipedia</a></p>`;
+    }
+    mountainMarker.bindPopup(details);
+    mountains.push(mountainMarker);
+  });
+  window.mountainMarkers = L.layerGroup(mountains).addTo(map);
+}
+
 function displayRates() {
   const currency = countryData.opencage.annotations.currency;
   const symbol = currency.html_entity || currency.symbol || null;
@@ -143,9 +169,6 @@ function displayRates() {
   $("#countryCurrencyFlag").attr({ src: flag, alt: `${countryName} flag` });
   $("#countryCurrencyCode").text(code);
   $("#countryCurrency").html(`${name} ${units}`);
-  console.log($("#countryCurrencyFlag").html());
-  console.log($("#countryCurrencyCode").html());
-  console.log($("#countryCurrency").html());
 
   for (const currency in countryData.rates.rates) {
     const rate = Number(countryData.rates.rates[currency]).toFixed(3);
@@ -202,6 +225,9 @@ function getCountry({ countryName, lat, lng }) {
         displayRates();
       } else {
         $("#ratesError").toggleClass("d-none");
+      }
+      if (data.mountains || null) {
+        displayMountains();
       }
       window.infoButton = L.easyButton(
         "fa-info",
@@ -309,14 +335,12 @@ function onLocationFound(e) {
   const lat = e.latlng.lat;
   const lng = e.latlng.lng;
   getCountry({ lat, lng });
-  //   console.log(lat, lng);
 }
 
 function onMapClick(e) {
   const lat = e.latlng.lat % 90;
   const lng = e.latlng.lng > 180 ? e.latlng.lng - 360 : e.latlng.lng;
   getCountry({ lat, lng });
-  //   console.log(lat, lng);
 }
 
 function resetMap() {
@@ -338,7 +362,6 @@ function validateCountry(country) {
     window.countryName = country;
     window.countryCode = $(`#${countryId}`).attr("data");
     getCountry({ countryName });
-    // console.log(countryName, countryCode);
   } else {
     alert("Not a valid country");
   }
