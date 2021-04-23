@@ -28,17 +28,11 @@
   </head>
   <body>
     <div id="map"></div>
-    <div
-      class="modal fade"
-      id="countryModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
+    <div class="modal fade" id="countryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <h1 class="modal-title" id="countryName"></h1>
             <button
               type="button"
               class="close"
@@ -48,16 +42,53 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">...</div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <nav>
+                    <div class="nav nav-tabs nav-fill" role="tablist">
+                      <a
+                        class="nav-link active"
+                        href="#nav-info"
+                        data-toggle="tab"
+                        aria-controls="nav-info"
+                        aria-selected="false"
+                        >Info</a
+                      >
+                      <a
+                        class="nav-link"
+                        href="#nav-finance"
+                        data-toggle="tab"
+                        aria-controls="nav-finance"
+                        aria-selected="false"
+                        >Finance</a
+                      >
+                    </div>
+                  </nav>
+                  <div id="nav-tabContent" class="tab-content">
+                    <div
+                      class="tab-pane show active"
+                      id="nav-info"
+                      role="tabpanel"
+                      aria-labelledby="nav-home-tab"
+                    >
+                      <table class="table table-sm table-hover">
+                        <tbody id="infoTable"></tbody>
+                      </table>
+                    </div>
+                    <div
+                      class="tab-pane"
+                      id="nav-finance"
+                      role="tabpanel"
+                      aria-labelledby="nav-profile-tab"
+                    >
+                      Finance
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -50,6 +50,57 @@ function checkURLHash() {
   }
 }
 
+function displayCountryInfo() {
+  let country = {};
+  const opencage = countryData.opencage;
+  const rest = countryData.rest;
+  country["Country Code"] = opencage.components.country_code;
+  country.Capital = rest.capital || null;
+  country.Continent = opencage.components.continent || null;
+  let population = rest.population || null;
+  if (population) {
+    country.Population = formatNumber(population);
+  }
+  let landArea = rest.area || null;
+  if (landArea) {
+    landArea = formatNumber(landArea);
+    country["Land Area"] = `${landArea} km<sup>2</sup>`;
+  }
+  const tz = opencage.annotations.timezone.short_name || null;
+  let offset = opencage.annotations.timezone.offset_string || null;
+  offset = offset ? `(${offset})` : null;
+  country["Time Zone"] = `${tz} ${offset}`;
+  callcode = opencage.annotations.callingcode || null;
+  country["Calling Code"] = callcode ? `+${callcode}` : null;
+  country["TLD"] = rest.topLevelDomain || null;
+  country.Demonym = rest.demonym || null;
+  const wiki = countryData.wiki || null;
+  country.Wikipedia = wiki
+    ? `<a href="${wiki}" target="_blank">Wikipedia</a>`
+    : null;
+  let langArr = [];
+  rest.languages.forEach((lang) => langArr.push(lang.name));
+  if (langArr.length > 1) {
+    country.Languages = langArr.join(", ");
+  } else {
+    country.Language = langArr[0];
+  }
+
+  const properties = Object.keys(country).sort();
+  let countryDetails = {};
+  properties.forEach((prop) => (countryDetails[prop] = country[prop]));
+  $("#countryName").html(
+    `${countryName} <img src="${rest.flag}" class="thumbnail alt="country flag">`
+  );
+  for (let key in countryDetails) {
+    if (countryDetails[key]) {
+      $("#infoTable").append(`<tr></tr>`);
+      $("#infoTable tr:last-child").append(`<th scope"row">${key}</th>`);
+      $("#infoTable tr:last-child").append(`<td >${countryDetails[key]}</td>`);
+    }
+  }
+}
+
 function displayBorders() {
   const data = countryData.borders.geometry;
   let borders = [];
@@ -72,6 +123,20 @@ function displayBorders() {
   }
   map.fitBounds(borders);
   window.borders = L.polygon(borders).addTo(map);
+}
+
+function formatNumber(n) {
+  if (n > 10 ** 9) {
+    return (n / 10 ** 9).toPrecision(2) + " billion";
+  } else if (n > 10 ** 8) {
+    return Math.round(n / 10 ** 6) + " million";
+  } else if (n > 10 ** 6) {
+    return (n / 10 ** 6).toPrecision(2) + " million";
+  } else if (n > 10 ** 4) {
+    return Math.round(n / 10 ** 3) + ",000";
+  } else {
+    return n;
+  }
 }
 
 function getCountry({ countryName, lat, lng }) {
@@ -102,6 +167,9 @@ function getCountry({ countryName, lat, lng }) {
       },
       { position: "topleft" }
     ).addTo(map);
+    if (data.opencage && data.rest) {
+      displayCountryInfo();
+    }
   });
 }
 
@@ -219,6 +287,7 @@ function resetMap() {
   if (window.infoButton) {
     window.infoButton.remove();
   }
+  $("#infoTable").empty();
 }
 
 function validateCountry(country) {

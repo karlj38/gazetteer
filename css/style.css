@@ -1,3 +1,11 @@
 #map {
   height: 100vh;
 }
+
+.thumbnail {
+  width: 70px;
+}
+
+#infoTable td {
+  text-align: right;
+}
