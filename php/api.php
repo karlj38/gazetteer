@@ -146,8 +146,21 @@ function getGeonamesTop10($feature, $code)
                 $wikiResult = json_decode(Wiki($location));
                 $top10->geonames[$i]->wiki = $wikiResult[3][0] ?? null;
             }
+            if ($feature === "cities") {
+                $top10->geonames[$i]->weather = getWeather($location, $code) ?? null;
+            }
         }
         return $top10->geonames;
+    }
+}
+
+function getWeather($location, $country)
+{
+    global $weather;
+    $url = "https://api.openweathermap.org/data/2.5/weather?q=$location,$country&units=metric&appid=$weather";
+    $result = json_decode(curl($url));
+    if ($result->cod === 200) {
+        return $result;
     }
 }
 
