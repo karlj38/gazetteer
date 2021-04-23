@@ -22,3 +22,13 @@
   width: 50px;
   max-height: 30px;
 }
+
+#weather .summary,
+.wi {
+  font-size: large;
+}
+
+#weather td {
+  padding: 0.5rem;
+  white-space: nowrap;
+}

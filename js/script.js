@@ -50,6 +50,15 @@ function checkURLHash() {
   }
 }
 
+function convertTime(unix) {
+  const d = new Date(unix * 1000);
+  let hours = d.getHours();
+  hours = hours < 10 ? `0${hours}` : hours;
+  let mins = d.getMinutes();
+  mins = mins < 10 ? `0${mins}` : mins;
+  return `${hours}:${mins}`;
+}
+
 function displayCountryInfo() {
   let country = {};
   const opencage = countryData.opencage;
@@ -405,4 +414,55 @@ function validateCountry(country) {
   } else {
     alert("Not a valid country");
   }
+}
+
+function weather(weather) {
+  const w = `
+  <h3>Current Weather</h3>
+    <table id="weather" class="table">
+      <tbody>
+      ${WeatherReport(weather)}
+      </tbody>
+    </table>`;
+  // console.log(w);
+  return w;
+}
+
+function WeatherReport(weather) {
+  const summaryIcon = `<i class="wi wi-owm-${weather.weather[0].id}"></i>`;
+  let summary = weather.weather[0].description;
+  summary = summary[0].toUpperCase() + summary.slice(1);
+  const currentTemp = Math.round(weather.main.temp);
+  const feels = Math.round(weather.main.feels_like);
+  const max = Math.round(weather.main.temp_max);
+  const min = Math.round(weather.main.temp_min);
+  const windDirIcon = `<i class = "wi wi-wind from-${weather.wind.deg}-deg"></i>`;
+  const windDir = weather.wind.deg;
+  const wind = Math.round(weather.wind.speed);
+  const pressure = weather.main.pressure;
+  const humidity = weather.main.humidity;
+  const sunrise = convertTime(weather.sys.sunrise);
+  const sunset = convertTime(weather.sys.sunset);
+  let $result = `
+  <tr>
+    <td class="summary">${summaryIcon} ${summary}</td>
+    <td ><span class="summary">${currentTemp}<i class = "wi wi-celsius"></i> </span>Feels like ${feels}<i class = "wi wi-celsius"></i></td>
+  </tr>
+  <tr>
+    <td><i class = "wi wi-thermometer"></i> ${max}<i class = "wi wi-celsius"></i></td>
+    <td><i class = "wi wi-thermometer-exterior"></i> ${min}<i class = "wi wi-celsius"></i></td>
+  </tr>
+  <tr>
+    <td><i class= "wi wi-strong-wind"></i> ${wind} m/s</td>
+    <td>${windDirIcon} ${windDir}&#176;</td>
+  </tr>
+  <tr>
+    <td><i class = "wi wi-humidity"></i> ${humidity} % </td>
+    <td><i class = "wi wi-barometer"></i> ${pressure} hPa</td>
+  </tr>
+  <tr>
+  <td><i class = "wi wi-sunrise"></i> ${sunrise}</td>
+  <td><i class = "wi wi-sunset"></i> ${sunset}</td>
+  </tr>`;
+  return $result;
 }
