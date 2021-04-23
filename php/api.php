@@ -37,6 +37,18 @@ function getBorders($countryCode)
     }
 }
 
+function getCurrencies($base)
+{
+    $url = "https://api.exchangerate.host/latest?base=$base&symbols=AUD,CAD,CHF,CNY,EUR,GBP,HKD,JPY,USD";
+    $ratesResult = curl($url);
+    $ratesResult = json_decode($ratesResult);
+    $flags = ["AUD" => "svg\Australia.svg", "CAD" => "svg\Canada.svg", "CHF" => "svg\Switzerland.svg", "CNY" => "svg\China.svg", "EUR" => "svg\Europe.svg", "GBP" => "svg\UK.svg", "HKD" => "svg\Hong_Kong.svg", "JPY" => "svg\Japan.svg", "USD" => "svg\USA.svg"];
+    if ($ratesResult->success) {
+        $ratesResult->flags = $flags;
+        return $ratesResult;
+    }
+}
+
 function getCountry()
 {
     $output = new stdClass();
@@ -69,8 +81,12 @@ function getCountry()
                 $rest = json_decode(restCountry($countryCode));
                 $output->rest = $rest ?? null;
 
-                $wikiResult = json_decode(Wiki($country));
-                $output->wiki = $wikiResult[3][0] ?? null;
+                $wiki = json_decode(Wiki($country));
+                $output->wiki = $wiki[3][0] ?? null;
+
+                $base = $result->annotations->currency->iso_code;
+                $rates = getCurrencies($base);
+                $output->rates = $rates ?? null;
             }
             return json_encode($output);
         }
