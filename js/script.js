@@ -125,6 +125,40 @@ function displayBorders() {
   window.borders = L.polygon(borders).addTo(map);
 }
 
+function displayCities() {
+  const data = countryData.cities;
+  let cities = [];
+  data.forEach((city) => {
+    const cityIcon = L.ExtraMarkers.icon({
+      prefix: "fa",
+      icon: "fa-city",
+      markerColor: city.name === countryData.rest.capital ? "red" : "yellow",
+    });
+    const cityMarker = L.marker([city.lat, city.lng], {
+      icon: cityIcon,
+      title: city.name,
+    });
+
+    let details = `<h2>${city.name}</h2>`;
+    if (city.name === countryData.rest.capital) {
+      details += `<p class="lead">Capital</p>`;
+    }
+    details += `<p><strong>Population:</strong> ${formatNumber(
+      city.population
+    )}</p>`;
+    if (city.wiki) {
+      details += `<p><a href="${city.wiki}" target="_blank">Wikipedia</a></p>`;
+    }
+    if (city.weather) {
+      details += weather(city.weather);
+    }
+
+    cityMarker.bindPopup(details);
+    cities.push(cityMarker);
+  });
+  window.cityMarkers = L.layerGroup(cities).addTo(map);
+}
+
 function displayMountains() {
   let mountains = [];
   const mountainIcon = L.ExtraMarkers.icon({
@@ -229,13 +263,10 @@ function getCountry({ countryName, lat, lng }) {
       if (data.mountains || null) {
         displayMountains();
       }
-      window.infoButton = L.easyButton(
-        "fa-info",
-        function () {
-          $("#countryModal").modal("toggle");
-        },
-        { position: "topleft" }
-      ).addTo(map);
+      if (data.cities || null) {
+        displayCities();
+      }
+      window.infoButton.enable();
     }
   });
 }
@@ -325,6 +356,15 @@ function init() {
     { position: "topright" }
   ).addTo(map);
   L.control.layers(baseLayers).addTo(map);
+  window.infoButton = L.easyButton(
+    "fa-info",
+    function () {
+      $("#countryModal").modal("toggle");
+    },
+    { position: "topleft" }
+  )
+    .addTo(map)
+    .disable();
 }
 
 function onLocationError(e) {
@@ -350,7 +390,7 @@ function resetMap() {
   map.removeLayer(cityMarkers);
   map.removeLayer(mountainMarkers);
   if (window.infoButton) {
-    window.infoButton.remove();
+    window.infoButton.disable();
   }
   $("#infoTable").empty();
   $("#financeTable").empty();
