@@ -9,6 +9,7 @@ window.map = L.map("map", {
 });
 window.cityMarkers = L.layerGroup();
 window.mountainMarkers = L.layerGroup();
+window.poiMarkers = L.layerGroup();
 window.countryData = null;
 window.countryName = null;
 window.countryCode = null;
@@ -143,7 +144,6 @@ function displayCities() {
       icon: "fa-city",
       markerColor: city.name === countryData.rest.capital ? "red" : "yellow",
     });
-    console.log(city.coordinates);
     const cityMarker = L.marker(
       [city.coordinates.latitude, city.coordinates.longitude],
       {
@@ -194,6 +194,33 @@ function displayMountains() {
     mountains.push(mountainMarker);
   });
   window.mountainMarkers = L.layerGroup(mountains).addTo(map);
+}
+
+function displayPOIs() {
+  const data = countryData.POIs;
+  let pois = [];
+  const poiIcon = L.ExtraMarkers.icon({
+    prefix: "fa",
+    icon: "fa-star",
+    markerColor: "blue",
+  });
+  data.forEach((poi) => {
+    const poiMarker = L.marker(
+      [poi.coordinates.latitude, poi.coordinates.longitude],
+      {
+        icon: poiIcon,
+        title: poi.name,
+      }
+    );
+    let details = `<h2>${poi.name}</h2>`;
+    details += `<p>${poi.snippet}</p>`;
+    if (poi.wiki) {
+      details += `<p><a href="${poi.wiki}" target="_blank">Wikipedia</a></p>`;
+    }
+    poiMarker.bindPopup(details);
+    pois.push(poiMarker);
+  });
+  window.poiMarkers = L.layerGroup(pois).addTo(map);
 }
 
 function displayRates() {
@@ -276,6 +303,9 @@ function getCountry({ countryName, lat, lng }) {
       }
       if (data.cities || null) {
         displayCities();
+      }
+      if (data.POIs || null) {
+        displayPOIs();
       }
       window.infoButton.enable();
     }
@@ -400,6 +430,7 @@ function resetMap() {
   }
   map.removeLayer(cityMarkers);
   map.removeLayer(mountainMarkers);
+  map.removeLayer(poiMarkers);
   if (window.infoButton) {
     window.infoButton.disable();
   }
