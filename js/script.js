@@ -143,18 +143,20 @@ function displayCities() {
       icon: "fa-city",
       markerColor: city.name === countryData.rest.capital ? "red" : "yellow",
     });
-    const cityMarker = L.marker([city.lat, city.lng], {
-      icon: cityIcon,
-      title: city.name,
-    });
+    console.log(city.coordinates);
+    const cityMarker = L.marker(
+      [city.coordinates.latitude, city.coordinates.longitude],
+      {
+        icon: cityIcon,
+        title: city.name,
+      }
+    );
 
     let details = `<h2>${city.name}</h2>`;
     if (city.name === countryData.rest.capital) {
       details += `<p class="lead">Capital</p>`;
     }
-    details += `<p><strong>Population:</strong> ${formatNumber(
-      city.population
-    )}</p>`;
+    details += `<p>${city.snippet}</p>`;
     if (city.wiki) {
       details += `<p><a href="${city.wiki}" target="_blank">Wikipedia</a></p>`;
     }

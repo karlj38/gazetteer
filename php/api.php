@@ -37,6 +37,30 @@ function getBorders($countryCode)
     }
 }
 
+function getCities($code)
+{
+    global $triposo;
+    global $tripToken;
+    $code = ($code === "GB") ? "UK" : $code;
+    $url = "https://www.triposo.com/api/20210317/location.json?countrycode=$code&fields=attribution,coordinates,name,snippet&account=$triposo&token=$tripToken";
+    $cities = json_decode(curl($url));
+    if (isset($cities->results)) {
+        foreach ($cities->results as $city) {
+            foreach ($city->attribution as $link) {
+                if ($link->source_id === "wikipedia") {
+                    $city->wiki = $link->url;
+                }
+            }
+            if (!isset($city->wiki)) {
+                $wikiResult = json_decode(Wiki($city->name));
+                $city->wiki = $wikiResult[3][0] ?? null;
+            }
+            $city->weather = getWeather($city->name, $code) ?? null;
+        }
+        return $cities;
+    }
+}
+
 function getCurrencies($base)
 {
     $url = "https://api.exchangerate.host/latest?base=$base&symbols=AUD,CAD,CHF,CNY,EUR,GBP,HKD,JPY,USD";
@@ -91,7 +115,7 @@ function getCountry()
                 $mountains = getGeonamesTop10("mountains", $countryCode);
                 $output->mountains = $mountains;
 
-                $cities = getGeonamesTop10("cities", $countryCode);
+                $cities = getCities($countryCode)->results ?? null;
                 $output->cities = $cities;
             }
             return json_encode($output);
