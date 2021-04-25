@@ -37,30 +37,6 @@ function getBorders($countryCode)
     }
 }
 
-function getCities($code)
-{
-    global $triposo;
-    global $tripToken;
-    $code = ($code === "GB") ? "UK" : $code;
-    $url = "https://www.triposo.com/api/20210317/location.json?countrycode=$code&fields=attribution,coordinates,name,snippet&account=$triposo&token=$tripToken";
-    $cities = json_decode(curl($url));
-    if (isset($cities->results)) {
-        foreach ($cities->results as $city) {
-            foreach ($city->attribution as $link) {
-                if ($link->source_id === "wikipedia") {
-                    $city->wiki = $link->url;
-                }
-            }
-            if (!isset($city->wiki)) {
-                $wikiResult = json_decode(Wiki($city->name));
-                $city->wiki = $wikiResult[3][0] ?? null;
-            }
-            $city->weather = getWeather($city->name, $code) ?? null;
-        }
-        return $cities;
-    }
-}
-
 function getCurrencies($base)
 {
     $url = "https://api.exchangerate.host/latest?base=$base&symbols=AUD,CAD,CHF,CNY,EUR,GBP,HKD,JPY,USD";
@@ -115,8 +91,11 @@ function getCountry()
                 $mountains = getGeonamesTop10("mountains", $countryCode);
                 $output->mountains = $mountains;
 
-                $cities = getCities($countryCode)->results ?? null;
+                $cities = triposo($countryCode, "cities")->results ?? null;
                 $output->cities = $cities;
+
+                $POIs = triposo($countryCode, "poi")->results ?? null;
+                $output->POIs = $POIs;
             }
             return json_encode($output);
         }
@@ -183,7 +162,7 @@ function getWeather($location, $country)
     global $weather;
     $url = "https://api.openweathermap.org/data/2.5/weather?q=$location,$country&units=metric&appid=$weather";
     $result = json_decode(curl($url));
-    if ($result->cod === 200) {
+    if (isset($result->cod) && $result->cod === 200) {
         return $result;
     }
 }
@@ -200,6 +179,39 @@ function restCountry($code)
 {
     $url = "https://restcountries.eu/rest/v2/alpha/$code";
     return curl($url);
+}
+
+function triposo($code, $query)
+{
+    global $triposo;
+    global $tripToken;
+    $code = ($code === "GB") ? "uk" : strtolower($code);
+    if ($query === "cities") {
+        $api = "location";
+        $type = "type=city&";
+    } else if ($query === "poi") {
+        $api = "poi";
+        $type = "";
+    }
+    $url = "https://www.triposo.com/api/20210317/$api.json?$type" . "countrycode=$code&fields=attribution,coordinates,name,snippet&account=$triposo&token=$tripToken";
+    $data = json_decode(curl($url));
+    if (isset($data->results)) {
+        foreach ($data->results as $place) {
+            foreach ($place->attribution as $link) {
+                if ($link->source_id === "wikipedia") {
+                    $place->wiki = $link->url;
+                }
+            }
+            if ($query === "cities") {
+                if (!isset($place->wiki)) {
+                    $wikiResult = json_decode(Wiki($place->name));
+                    $place->wiki = $wikiResult[3][0] ?? null;
+                }
+                $place->weather = getWeather($place->name, $code) ?? null;
+            }
+        }
+        return $data;
+    }
 }
 
 function Wiki($search)
