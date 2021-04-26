@@ -167,7 +167,10 @@ function displayCities() {
       details += weather(city.weather);
     }
 
-    cityMarker.bindPopup(details);
+    cityMarker.on("click", function () {
+      $("#popupContent").html(details);
+      $("#popupModal").modal("toggle");
+    });
     cities.push(cityMarker);
   });
   window.cityMarkers = L.layerGroup(cities).addTo(map);
@@ -223,7 +226,10 @@ function displayMountains() {
     if (mountain.wiki) {
       details += `<p><a href="${mountain.wiki}" target="_blank">Wikipedia</a></p>`;
     }
-    mountainMarker.bindPopup(details);
+    mountainMarker.on("click", function () {
+      $("#popupContent").html(details);
+      $("#popupModal").modal("toggle");
+    });
     mountains.push(mountainMarker);
   });
   window.mountainMarkers = L.layerGroup(mountains).addTo(map);
@@ -250,7 +256,10 @@ function displayPOIs() {
     if (poi.wiki) {
       details += `<p><a href="${poi.wiki}" target="_blank">Wikipedia</a></p>`;
     }
-    poiMarker.bindPopup(details);
+    poiMarker.on("click", function () {
+      $("#popupContent").html(details);
+      $("#popupModal").modal("toggle");
+    });
     pois.push(poiMarker);
   });
   window.poiMarkers = L.layerGroup(pois).addTo(map);
