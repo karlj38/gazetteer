@@ -49,6 +49,7 @@
                   <nav>
                     <div class="nav nav-tabs nav-fill" role="tablist">
                       <a
+                        id="info-link"
                         class="nav-link active"
                         href="#nav-info"
                         data-toggle="tab"
@@ -58,6 +59,7 @@
                         >Info</a
                       >
                       <a
+                        id="finance-link"
                         class="nav-link"
                         href="#nav-finance"
                         data-toggle="tab"
@@ -65,6 +67,16 @@
                         aria-controls="nav-finance"
                         aria-selected="false"
                         >Finance</a
+                      >
+                      <a
+                        id="covid-link"
+                        class="nav-link"
+                        href="#nav-covid"
+                        data-toggle="tab"
+                        role="tab"
+                        aria-controls="nav-covid"
+                        aria-selected="false"
+                        >COVID 19</a
                       >
                     </div>
                   </nav>
@@ -112,6 +124,52 @@
                       <p id="ratesError" class="d-none">
                         Exchange rate data not available.
                       </p>
+                    </div>
+                    <div
+                      class="tab-pane"
+                      id="nav-covid"
+                      role="tabpanel"
+                      aria-labelledby="nav-covid"
+                    >
+                      <p class="pt-4">
+                        Most recent data: <span id="latestDate"></span>
+                      </p>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Cases</th>
+                            <th scope="col">Deaths</th>
+                            <th scope="col">Recovered</th>
+                          </tr>
+                        </thead>
+                        <tbody id="covidTable">
+                          <tr>
+                            <td id="">This day</td>
+                            <td id="lC"></td>
+                            <td id="lD"></td>
+                            <td id="lR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">Prev. week</td>
+                            <td id="wC"></td>
+                            <td id="wD"></td>
+                            <td id="wR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">Prev. month</td>
+                            <td id="mC"></td>
+                            <td id="mD"></td>
+                            <td id="mR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">All time</td>
+                            <td id="tC"></td>
+                            <td id="tD"></td>
+                            <td id="tR"></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>

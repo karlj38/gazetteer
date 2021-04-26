@@ -170,6 +170,36 @@ function displayCities() {
   window.cityMarkers = L.layerGroup(cities).addTo(map);
 }
 
+function displayCovid() {
+  const covid = countryData.covid;
+  let data = {};
+  lastEntry = covid.length - 1;
+  recent = covid[lastEntry];
+  prevD = covid[lastEntry - 1];
+  prevW = covid[lastEntry - 7];
+  prevM = covid[lastEntry - 30];
+  data.latestDate = recent.date;
+  data.tC = formatNumber(recent.confirmed);
+  data.tD = formatNumber(recent.deaths);
+  data.tR = formatNumber(recent.recovered);
+  data.lC = formatNumber(recent.confirmed - prevD.confirmed);
+  data.lD = formatNumber(recent.deaths - prevD.deaths);
+  data.lR = formatNumber(recent.recovered - prevD.recovered);
+  data.wC = formatNumber(recent.confirmed - prevW.confirmed);
+  data.wD = formatNumber(recent.deaths - prevW.deaths);
+  data.wR = formatNumber(recent.recovered - prevW.recovered);
+  data.mC = formatNumber(recent.confirmed - prevM.confirmed);
+  data.mD = formatNumber(recent.deaths - prevM.deaths);
+  data.mR = formatNumber(recent.recovered - prevM.recovered);
+  for (const key in data) {
+    if (Object.hasOwnProperty.call(data, key)) {
+      const value = data[key];
+      $(`#${key}`).text(value);
+    }
+  }
+  $("#covid-link").removeClass("d-none");
+}
+
 function displayMountains() {
   let mountains = [];
   const mountainIcon = L.ExtraMarkers.icon({
@@ -316,6 +346,11 @@ function getCountry({ countryName, lat, lng }) {
       }
       if (data.POIs || null) {
         displayPOIs();
+      }
+      if (data.covid || null) {
+        displayCovid();
+      } else {
+        $("#covid-link").addClass("d-none");
       }
       window.infoButton.enable();
     }
