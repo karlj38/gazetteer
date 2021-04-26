@@ -12,6 +12,9 @@ if ($api = $_GET["get"] ?? null) {
         case "country":
             echo getCountry();
             break;
+        case "geocode":
+            echo geocode();
+            break;
     }
 }
 
@@ -24,6 +27,16 @@ function curl($url)
     $result = curl_exec($ch);
     curl_close($ch);
     return $result;
+}
+
+function geocode()
+{
+    if (($lat = $_GET["lat"] ?? null) && ($lng = $_GET["lng"] ?? null)) {
+        $opencage =  json_decode(opencage("$lat+$lng"));
+        if ($code = $opencage->results[0]->components->country_code ?? null) {
+            return json_encode(["country_code" => $code]);
+        }
+    }
 }
 
 function getBorders($countryCode)
@@ -58,48 +71,49 @@ function getCountry()
         $opencage = opencage($country);
     }
     $opencage = json_decode($opencage);
-    if (($status = $opencage->status->code ?? null) && $status === 200 && ($result = $opencage->results[0] ?? null)) {
-        if ($countryCode = $result->components->country_code ?? null) {
-            $result->components->country_code = strtoupper($countryCode);
+    $result = $opencage->results[0] ?? null;
+    // if (($status = $opencage->status->code ?? null) && $status === 200 && ($result = $opencage->results[0] ?? null)) {
+    if ($countryCode = $result->components->country_code ?? null) {
+        $result->components->country_code = strtoupper($countryCode);
 
-            if ($result->components->country_code === "CI") {
-                $result->components->country = "Ivory Coast";
-            } else if ($result->components->country_code === "XK") {
-                $result->components->country = "Kosovo";
-            } elseif ($result->components->country === "Somaliland") {
-                $result->components->country = "Somalia";
-            }
-
-            $country = $country ?? $result->components->country;
-            $countryCode = $result->components->country_code;
-
-            if ($borders = getBorders($countryCode) ?? null) {
-                $output->borders = $borders;
-
-                $output->opencage = $result;
-
-                $rest = json_decode(restCountry($countryCode));
-                $output->rest = $rest ?? null;
-
-                $wiki = json_decode(Wiki($country));
-                $output->wiki = $wiki[3][0] ?? null;
-
-                $base = $result->annotations->currency->iso_code;
-                $rates = getCurrencies($base);
-                $output->rates = $rates ?? null;
-
-                $mountains = getGeonamesTop10("mountains", $countryCode);
-                $output->mountains = $mountains;
-
-                $cities = triposo($countryCode, "cities")->results ?? null;
-                $output->cities = $cities;
-
-                $POIs = triposo($countryCode, "poi")->results ?? null;
-                $output->POIs = $POIs;
-            }
-            return json_encode($output);
+        if ($result->components->country_code === "CI") {
+            $result->components->country = "Ivory Coast";
+        } else if ($result->components->country_code === "XK") {
+            $result->components->country = "Kosovo";
+        } elseif ($result->components->country === "Somaliland") {
+            $result->components->country = "Somalia";
         }
+
+        $country = $country ?? $result->components->country;
+        $countryCode = $result->components->country_code;
+
+        if ($borders = getBorders($countryCode) ?? null) {
+            $output->borders = $borders;
+
+            $output->opencage = $result;
+
+            $rest = json_decode(restCountry($countryCode));
+            $output->rest = $rest ?? null;
+
+            $wiki = json_decode(Wiki($country));
+            $output->wiki = $wiki[3][0] ?? null;
+
+            $base = $result->annotations->currency->iso_code;
+            $rates = getCurrencies($base);
+            $output->rates = $rates ?? null;
+
+            $mountains = getGeonamesTop10("mountains", $countryCode);
+            $output->mountains = $mountains;
+
+            $cities = triposo($countryCode, "cities")->results ?? null;
+            $output->cities = $cities;
+
+            $POIs = triposo($countryCode, "poi")->results ?? null;
+            $output->POIs = $POIs;
+        }
+        return json_encode($output);
     }
+    // }
 }
 
 function getCountryList()
@@ -154,6 +168,16 @@ function getGeonamesTop10($feature, $code)
             }
         }
         return $top10->geonames;
+    }
+}
+
+function getNews($code)
+{
+    global $news;
+    $countries = ["AE", "AR", "AT", "AU", "BE", "BG", "BR", "CA", "CH", "CN", "CO", "CU", "CZ", "DE", "EG", "FR", "GB", "GR", "HK", "HU", "ID", "IE", "IL", "IN", "IT", "JP", "KR", "LT", "LV", "MA", "MX", "MY", "NG", "NL", "NO", "NZ", "PH", "PL", "PT", "RO", "RS", "RU", "SA", "SE", "SG", "SI", "SK", "TH", "TR", "TW", "UA", "US", "VE", "ZA"];
+    if (in_array($code, $countries)) {
+        $url = "https://newsapi.org/v2/top-headlines?country=$code&apiKey=$news";
+        return json_decode(curl($url));
     }
 }
 

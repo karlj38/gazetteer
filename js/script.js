@@ -269,7 +269,17 @@ function formatNumber(n) {
   }
 }
 
+function geocode(lat, lng) {
+  $.getJSON("php/api", { get: "geocode", lat, lng }, function (data, status) {
+    console.log(data);
+    if (data.country_code || null) {
+      getCountry({ lat, lng });
+    }
+  });
+}
+
 function getCountry({ countryName, lat, lng }) {
+  $("#preloader").fadeIn();
   resetMap();
   let params = { get: "country" };
   if (countryName) {
@@ -309,6 +319,8 @@ function getCountry({ countryName, lat, lng }) {
       }
       window.infoButton.enable();
     }
+  }).then(function () {
+    $("#preloader").fadeOut();
   });
 }
 
@@ -410,6 +422,7 @@ function init() {
 
 function onLocationError(e) {
   alert(e.message);
+  $("#preloader").fadeOut();
 }
 
 function onLocationFound(e) {
@@ -421,7 +434,7 @@ function onLocationFound(e) {
 function onMapClick(e) {
   const lat = e.latlng.lat % 90;
   const lng = e.latlng.lng > 180 ? e.latlng.lng - 360 : e.latlng.lng;
-  getCountry({ lat, lng });
+  geocode(lat, lng);
 }
 
 function resetMap() {
@@ -457,7 +470,6 @@ function weather(weather) {
       ${WeatherReport(weather)}
       </tbody>
     </table>`;
-  // console.log(w);
   return w;
 }
 
