@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gazetteer</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="vendors/Bootstrap4.6.0/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="vendors/Leaflet1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="vendors/LeafletEasyButton/easy-button.css" />
+    <link
+      rel="stylesheet"
+      href="vendors/LeafletExtraMarkers/css/leaflet.extra-markers.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="vendors/weatherIcons/css/weather-icons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="vendors/weatherIcons/css/weather-icons-wind.min.css"
+    />
+    <link rel="stylesheet" href="css/style.min.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="modal fade" id="countryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title" id="countryName"></h1>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <nav>
+                    <div class="nav nav-tabs nav-fill" role="tablist">
+                      <a
+                        id="info-link"
+                        class="nav-link active"
+                        href="#nav-info"
+                        data-toggle="tab"
+                        role="tab"
+                        aria-controls="nav-info"
+                        aria-selected="false"
+                        >Info</a
+                      >
+                      <a
+                        id="finance-link"
+                        class="nav-link"
+                        href="#nav-finance"
+                        data-toggle="tab"
+                        role="tab"
+                        aria-controls="nav-finance"
+                        aria-selected="false"
+                        >Finance</a
+                      >
+                      <a
+                        id="covid-link"
+                        class="nav-link"
+                        href="#nav-covid"
+                        data-toggle="tab"
+                        role="tab"
+                        aria-controls="nav-covid"
+                        aria-selected="false"
+                        >COVID 19</a
+                      >
+                    </div>
+                  </nav>
+                  <div id="nav-tabContent" class="tab-content">
+                    <div
+                      class="tab-pane show active"
+                      id="nav-info"
+                      role="tabpanel"
+                      aria-labelledby="nav-info"
+                    >
+                      <table class="table table-sm table-hover">
+                        <tbody id="infoTable"></tbody>
+                      </table>
+                    </div>
+                    <div
+                      class="tab-pane"
+                      id="nav-finance"
+                      role="tabpanel"
+                      aria-labelledby="nav-finance"
+                    >
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <td class="">
+                              <img
+                                id="countryCurrencyFlag"
+                                src="#"
+                                class="currencyFlag"
+                                alt=""
+                              />
+                            </td>
+                            <th
+                              id="countryCurrencyCode"
+                              scope="row"
+                              class=""
+                            ></th>
+                            <td
+                              id="countryCurrency"
+                              class="w-50 text-right"
+                            ></td>
+                          </tr>
+                        </thead>
+                        <tbody id="financeTable"></tbody>
+                      </table>
+                      <p id="ratesError" class="d-none">
+                        Exchange rate data not available.
+                      </p>
+                    </div>
+                    <div
+                      class="tab-pane"
+                      id="nav-covid"
+                      role="tabpanel"
+                      aria-labelledby="nav-covid"
+                    >
+                      <p class="pt-4">
+                        Most recent data: <span id="latestDate"></span>
+                      </p>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Cases</th>
+                            <th scope="col">Deaths</th>
+                            <th scope="col">Recovered</th>
+                          </tr>
+                        </thead>
+                        <tbody id="covidTable">
+                          <tr>
+                            <td id="">This day</td>
+                            <td id="lC"></td>
+                            <td id="lD"></td>
+                            <td id="lR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">Prev. week</td>
+                            <td id="wC"></td>
+                            <td id="wD"></td>
+                            <td id="wR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">Prev. month</td>
+                            <td id="mC"></td>
+                            <td id="mD"></td>
+                            <td id="mR"></td>
+                          </tr>
+                          <tr>
+                            <td id="">All time</td>
+                            <td id="tC"></td>
+                            <td id="tD"></td>
+                            <td id="tR"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="popupModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <div id="popupContent"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="preloader"></div>
+    <script src="vendors/jQuery3.6.0/jquery-3.6.0.min.js"></script>
+    <script src="vendors/Bootstrap4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="vendors/Fontawesome5.15.3/js/all.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="vendors/Leaflet1.7.1/leaflet.js"></script>
+    <script src="vendors/LeafletProviders1.3.1/leaflet-providers.js"></script>
+    <script src="vendors/LeafletEasyButton/easy-button.js"></script>
+    <script src="vendors/LeafletExtraMarkers/js/leaflet.extra-markers.min.js"></script>
+    <script src="js/script.min.js"></script>
+  </body>
+</html>
