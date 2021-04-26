@@ -132,7 +132,10 @@ function displayBorders() {
     });
   }
   map.fitBounds(borders);
-  window.borders = L.polygon(borders).addTo(map);
+  window.borders = L.polygon(borders, { bubblingMouseEvents: false }).addTo(
+    map
+  );
+  L.DomEvent.disableClickPropagation($(window.borders).get(0));
 }
 
 function displayCities() {
@@ -301,7 +304,6 @@ function formatNumber(n) {
 
 function geocode(lat, lng) {
   $.getJSON("php/api", { get: "geocode", lat, lng }, function (data, status) {
-    console.log(data);
     if (data.country_code || null) {
       getCountry({ lat, lng });
     }
