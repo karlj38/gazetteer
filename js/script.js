@@ -481,8 +481,9 @@ function markerModal({ title, summary, image, wiki }) {
     $("#markerCapital").addClass("d-none");
   }
   if (image) {
+    const https = image.replace("http", "https");
     $("#markerImg")
-      .attr({ src: image, alt: title })
+      .attr({ src: https, alt: title })
       .removeClass("d-none")
       .addClass("d-block");
   } else {
