@@ -158,7 +158,7 @@ function displayCities() {
       markerModal({
         title: city.name,
         summary: city.snippet,
-        image: city.images.sizes.thumbnail.url || null,
+        image: city.images ? city.images.sizes.thumbnail.url : null,
         wiki: city.wiki,
       });
       if (city.weather) {
@@ -244,7 +244,7 @@ function displayMountains() {
       markerModal({
         title: mountain.name,
         summary: mountain.snippet,
-        image: mountain.images.sizes.thumbnail.url || null,
+        image: mountain.images ? mountain.images.sizes.thumbnail.url : null,
         wiki: mountain.wiki,
       });
     });
@@ -273,7 +273,7 @@ function displayPOIs() {
       markerModal({
         title: poi.name,
         summary: poi.snippet,
-        image: poi.images.sizes.thumbnail.url || null,
+        image: poi.images ? poi.images.sizes.thumbnail.url : null,
         wiki: poi.wiki,
       });
     });

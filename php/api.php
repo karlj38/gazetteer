@@ -191,7 +191,7 @@ function triposo($code, $query)
     $data = json_decode(curl($url));
     if (isset($data->results)) {
         foreach ($data->results as $place) {
-            $place->images = $place->images[0];
+            $place->images = $place->images[0] ?? null;
             foreach ($place->attribution as $link) {
                 if ($link->source_id === "wikipedia") {
                     $place->wiki = $link->url;
