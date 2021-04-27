@@ -185,15 +185,15 @@ function getGeonamesTop10($feature, $code)
     }
 }
 
-function getNews($code)
-{
-    global $news;
-    $countries = ["AE", "AR", "AT", "AU", "BE", "BG", "BR", "CA", "CH", "CN", "CO", "CU", "CZ", "DE", "EG", "FR", "GB", "GR", "HK", "HU", "ID", "IE", "IL", "IN", "IT", "JP", "KR", "LT", "LV", "MA", "MX", "MY", "NG", "NL", "NO", "NZ", "PH", "PL", "PT", "RO", "RS", "RU", "SA", "SE", "SG", "SI", "SK", "TH", "TR", "TW", "UA", "US", "VE", "ZA"];
-    if (in_array($code, $countries)) {
-        $url = "https://newsapi.org/v2/top-headlines?country=$code&apiKey=$news";
-        return json_decode(curl($url));
-    }
-}
+// function getNews($code)
+// {
+//     global $news;
+//     $countries = ["AE", "AR", "AT", "AU", "BE", "BG", "BR", "CA", "CH", "CN", "CO", "CU", "CZ", "DE", "EG", "FR", "GB", "GR", "HK", "HU", "ID", "IE", "IL", "IN", "IT", "JP", "KR", "LT", "LV", "MA", "MX", "MY", "NG", "NL", "NO", "NZ", "PH", "PL", "PT", "RO", "RS", "RU", "SA", "SE", "SG", "SI", "SK", "TH", "TR", "TW", "UA", "US", "VE", "ZA"];
+//     if (in_array($code, $countries)) {
+//         $url = "https://newsapi.org/v2/top-headlines?country=$code&apiKey=$news";
+//         return json_decode(curl($url));
+//     }
+// }
 
 function getWeather($location, $country)
 {
@@ -231,10 +231,11 @@ function triposo($code, $query)
         $api = "poi";
         $type = "";
     }
-    $url = "https://www.triposo.com/api/20210317/$api.json?$type" . "countrycode=$code&fields=attribution,coordinates,name,snippet&account=$triposo&token=$tripToken";
+    $url = "https://www.triposo.com/api/20210317/$api.json?$type" . "countrycode=$code&fields=attribution,coordinates,images,name,snippet&account=$triposo&token=$tripToken";
     $data = json_decode(curl($url));
     if (isset($data->results)) {
         foreach ($data->results as $place) {
+            $place->images = $place->images[0];
             foreach ($place->attribution as $link) {
                 if ($link->source_id === "wikipedia") {
                     $place->wiki = $link->url;
