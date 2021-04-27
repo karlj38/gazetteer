@@ -232,16 +232,21 @@ function displayMountains() {
   });
   const data = countryData.mountains;
   data.forEach((mountain) => {
-    const mountainMarker = L.marker([mountain.lat, mountain.lng], {
-      icon: mountainIcon,
-      title: mountain.name,
-    });
-    let elevation = mountain.elevation || null;
-    elevation = elevation ? elevation + " m" : "undefined";
-    elevation = `<strong>Elevation:</strong> ${elevation} `;
+    const mountainMarker = L.marker(
+      [mountain.coordinates.latitude, mountain.coordinates.longitude],
+      {
+        icon: mountainIcon,
+        title: mountain.name,
+      }
+    );
 
     mountainMarker.on("click", function () {
-      markerModal(mountain.name, elevation, mountain.wiki);
+      markerModal({
+        title: mountain.name,
+        summary: mountain.snippet,
+        image: mountain.images.sizes.thumbnail.url || null,
+        wiki: mountain.wiki,
+      });
     });
     mountains.push(mountainMarker);
   });
@@ -476,9 +481,12 @@ function markerModal({ title, summary, image, wiki }) {
     $("#markerCapital").addClass("d-none");
   }
   if (image) {
-    $("#markerImg").attr({ src: image, alt: title }).removeClass("d-none");
+    $("#markerImg")
+      .attr({ src: image, alt: title })
+      .removeClass("d-none")
+      .addClass("d-block");
   } else {
-    $("markerImg").addClass("d-none");
+    $("#markerImg").addClass("d-none").removeClass("d-block");
   }
   if (wiki) {
     $("#markerLink").attr("href", wiki);
