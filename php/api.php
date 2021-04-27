@@ -82,7 +82,7 @@ function getCountry()
     }
     $opencage = json_decode($opencage);
     $result = $opencage->results[0] ?? null;
-    // if (($status = $opencage->status->code ?? null) && $status === 200 && ($result = $opencage->results[0] ?? null)) {
+
     if ($countryCode = $result->components->country_code ?? null) {
         $result->components->country_code = strtoupper($countryCode);
 
@@ -112,11 +112,11 @@ function getCountry()
             $rates = getCurrencies($base);
             $output->rates = $rates ?? null;
 
-            $mountains = getGeonamesTop10("mountains", $countryCode);
-            $output->mountains = $mountains;
-
             $cities = triposo($countryCode, "cities")->results ?? null;
             $output->cities = $cities;
+
+            $mountains = triposo($countryCode, "mountains")->results ?? null;
+            $output->mountains = $mountains;
 
             $POIs = triposo($countryCode, "poi")->results ?? null;
             $output->POIs = $POIs;
@@ -127,7 +127,6 @@ function getCountry()
         }
         return json_encode($output);
     }
-    // }
 }
 
 function getCountryList()
@@ -143,57 +142,6 @@ function getCountryList()
     }
     return json_encode($countries);
 }
-
-function getGeonamesTop10($feature, $code)
-{
-    global $geonames;
-    switch ($feature) {
-        case "cities":
-            $featureClass = "P";
-            $order = "population";
-            break;
-        case "mountains":
-            $featureClass = "T";
-            $order = "elevation";
-            break;
-    }
-
-    $url = "http://api.geonames.org/searchJSON?featureClass=$featureClass&maxRows=10&orderby=$order&country=$code&style=full&username=$geonames";
-    $top10 =  json_decode(curl($url));
-    if ($top10->totalResultsCount > 0) {
-        $geonamesData = $top10->geonames;
-        for ($i = 0; $i < count($geonamesData); $i++) {
-            $geoname = $geonamesData[$i];
-            if ($list = $geoname->alternateNames ?? null) {
-                foreach ($list as $index => $value) {
-                    if ($value->lang === "link") {
-                        $geoname->wiki = $value->name;
-                        break;
-                    }
-                }
-            }
-            $location = $geoname->name;
-            if (!isset($geoname->wiki)) {
-                $wikiResult = json_decode(Wiki($location));
-                $top10->geonames[$i]->wiki = $wikiResult[3][0] ?? null;
-            }
-            if ($feature === "cities") {
-                $top10->geonames[$i]->weather = getWeather($location, $code) ?? null;
-            }
-        }
-        return $top10->geonames;
-    }
-}
-
-// function getNews($code)
-// {
-//     global $news;
-//     $countries = ["AE", "AR", "AT", "AU", "BE", "BG", "BR", "CA", "CH", "CN", "CO", "CU", "CZ", "DE", "EG", "FR", "GB", "GR", "HK", "HU", "ID", "IE", "IL", "IN", "IT", "JP", "KR", "LT", "LV", "MA", "MX", "MY", "NG", "NL", "NO", "NZ", "PH", "PL", "PT", "RO", "RS", "RU", "SA", "SE", "SG", "SI", "SK", "TH", "TR", "TW", "UA", "US", "VE", "ZA"];
-//     if (in_array($code, $countries)) {
-//         $url = "https://newsapi.org/v2/top-headlines?country=$code&apiKey=$news";
-//         return json_decode(curl($url));
-//     }
-// }
 
 function getWeather($location, $country)
 {
@@ -224,13 +172,21 @@ function triposo($code, $query)
     global $triposo;
     global $tripToken;
     $code = ($code === "GB") ? "uk" : strtolower($code);
-    if ($query === "cities") {
-        $api = "location";
-        $type = "type=city&";
-    } else if ($query === "poi") {
-        $api = "poi";
-        $type = "";
+    switch ($query) {
+        case 'cities':
+            $api = "location";
+            $type = "type=city&";
+            break;
+        case 'mountains':
+            $api = "poi";
+            $type = "tag_labels=poitype-Mountain&";
+            break;
+        case 'poi':
+            $api = "poi";
+            $type = "";
+            break;
     }
+
     $url = "https://www.triposo.com/api/20210317/$api.json?$type" . "countrycode=$code&fields=attribution,coordinates,images,name,snippet&account=$triposo&token=$tripToken";
     $data = json_decode(curl($url));
     if (isset($data->results)) {
