@@ -155,7 +155,12 @@ function displayCities() {
     );
 
     cityMarker.on("click", function () {
-      markerModal(city.name, city.snippet, city.wiki);
+      markerModal({
+        title: city.name,
+        summary: city.snippet,
+        image: city.images.sizes.thumbnail.url || null,
+        wiki: city.wiki,
+      });
       if (city.weather) {
         weather(city.weather);
       } else {
@@ -260,7 +265,12 @@ function displayPOIs() {
       }
     );
     poiMarker.on("click", function () {
-      markerModal(poi.name, poi.snippet, poi.wiki);
+      markerModal({
+        title: poi.name,
+        summary: poi.snippet,
+        image: poi.images.sizes.thumbnail.url || null,
+        wiki: poi.wiki,
+      });
     });
     pois.push(poiMarker);
   });
@@ -457,13 +467,18 @@ function init() {
     .disable();
 }
 
-function markerModal(title, summary, wiki) {
+function markerModal({ title, summary, image, wiki }) {
   $("#markerTitle").text(title);
   $("#markerSummary").html(summary);
   if (title === countryData.rest.capital) {
     $("#markerCapital").removeClass("d-none");
   } else {
     $("#markerCapital").addClass("d-none");
+  }
+  if (image) {
+    $("#markerImg").attr({ src: image, alt: title }).removeClass("d-none");
+  } else {
+    $("markerImg").addClass("d-none");
   }
   if (wiki) {
     $("#markerLink").attr("href", wiki);
