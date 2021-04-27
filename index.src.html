@@ -32,7 +32,15 @@
       <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title" id="countryName"></h1>
+            <h1 class="modal-title">
+              <span id="countryName"></span>
+              <img
+                src="#"
+                id="countryFlag"
+                class="thumbnail"
+                alt="country flag"
+              />
+            </h1>
             <button
               type="button"
               class="close"
@@ -56,7 +64,7 @@
                         role="tab"
                         aria-controls="nav-info"
                         aria-selected="false"
-                        >Info</a
+                        >Country Info</a
                       >
                       <a
                         id="finance-link"
@@ -88,7 +96,61 @@
                       aria-labelledby="nav-info"
                     >
                       <table class="table table-sm table-hover">
-                        <tbody id="infoTable"></tbody>
+                        <tbody id="infoTable">
+                          <tr id="callingCodeRow">
+                            <th scope="row">Calling Code</th>
+                            <td id="callingCode" class="text-right"></td>
+                          </tr>
+                          <tr id="capitalRow">
+                            <th scope="row">Capital</th>
+                            <td id="capital" class="text-right"></td>
+                          </tr>
+                          <tr id="continentRow">
+                            <th scope="row">Continent</th>
+                            <td id="continent" class="text-right"></td>
+                          </tr>
+                          <tr id="countryCodeRow">
+                            <th scope="row">Country Code</th>
+                            <td id="countryCode" class="text-right"></td>
+                          </tr>
+                          <tr id="demonymRow">
+                            <th scope="row">Demonym</th>
+                            <td id="demonym" class="text-right"></td>
+                          </tr>
+                          <tr id="landAreaRow">
+                            <th scope="row">Land Area</th>
+                            <td>
+                              <span id="landArea" class="text-right"></span>
+                              km<sup>2</sup>
+                            </td>
+                          </tr>
+                          <tr id="languageRow">
+                            <th id="langaugeHeader" scope="row">Language</th>
+                            <td id="language" class="text-right"></td>
+                          </tr>
+                          <tr id="languagesRow">
+                            <th id="langaugesHeader" scope="row">Languages</th>
+                            <td id="languages" class="text-right"></td>
+                          </tr>
+                          <tr id="populationRow">
+                            <th scope="row">Population</th>
+                            <td id="population" class="text-right"></td>
+                          </tr>
+                          <tr id="tldRow">
+                            <th scope="row">TLD</th>
+                            <td id="tld" class="text-right"></td>
+                          </tr>
+                          <tr id="tzRow">
+                            <th scope="row">Time Zone</th>
+                            <td id="tz" class="text-right"></td>
+                          </tr>
+                          <tr id="wikiRow">
+                            <th scope="row">Wikipedia</th>
+                            <td class="text-right">
+                              <a id="wiki" href="" target="_blank">Wikipedia</a>
+                            </td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                     <div
@@ -119,7 +181,116 @@
                             ></td>
                           </tr>
                         </thead>
-                        <tbody id="financeTable"></tbody>
+                        <tbody id="financeTable">
+                          <tr id="AUDRow">
+                            <td>
+                              <img
+                                id="AUDFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="AUDCode" scope="row"></th>
+                            <td id="AUDRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="CADRow">
+                            <td>
+                              <img
+                                id="CADFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="CADCode" scope="row"></th>
+                            <td id="CADRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="CHFRow">
+                            <td>
+                              <img
+                                id="CHFFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="CHFCode" scope="row"></th>
+                            <td id="CHFRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="CNYRow">
+                            <td>
+                              <img
+                                id="CNYFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="CNYCode" scope="row"></th>
+                            <td id="CNYRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="EURRow">
+                            <td>
+                              <img
+                                id="EURFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="EURCode" scope="row"></th>
+                            <td id="EURRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="GBPRow">
+                            <td>
+                              <img
+                                id="GBPFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="GBPCode" scope="row"></th>
+                            <td id="GBPRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="HKDRow">
+                            <td>
+                              <img
+                                id="HKDFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="HKDCode" scope="row"></th>
+                            <td id="HKDRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="JPYRow">
+                            <td>
+                              <img
+                                id="JPYFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="JPYCode" scope="row"></th>
+                            <td id="JPYRate" class="text-right w-50"></td>
+                          </tr>
+                          <tr id="USDRow">
+                            <td>
+                              <img
+                                id="USDFlag"
+                                class="currencyFlag"
+                                src="#"
+                                alt=""
+                              />
+                            </td>
+                            <th id="USDCode" scope="row"></th>
+                            <td id="USDRate" class="text-right w-50"></td>
+                          </tr>
+                        </tbody>
                       </table>
                       <p id="ratesError" class="d-none">
                         Exchange rate data not available.
@@ -145,25 +316,25 @@
                         </thead>
                         <tbody id="covidTable">
                           <tr>
-                            <td id="">This day</td>
+                            <td>This day</td>
                             <td id="lC" class="text-right"></td>
                             <td id="lD" class="text-right"></td>
                             <td id="lR" class="text-right"></td>
                           </tr>
                           <tr>
-                            <td id="">Prev. week</td>
+                            <td>Prev. week</td>
                             <td id="wC" class="text-right"></td>
                             <td id="wD" class="text-right"></td>
                             <td id="wR" class="text-right"></td>
                           </tr>
                           <tr>
-                            <td id="">Prev. month</td>
+                            <td>Prev. month</td>
                             <td id="mC" class="text-right"></td>
                             <td id="mD" class="text-right"></td>
                             <td id="mR" class="text-right"></td>
                           </tr>
                           <tr>
-                            <td id="">All time</td>
+                            <td>All time</td>
                             <td id="tC" class="text-right"></td>
                             <td id="tD" class="text-right"></td>
                             <td id="tR" class="text-right"></td>
@@ -179,7 +350,7 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="popupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="markerModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-body">
@@ -194,7 +365,84 @@
                   >
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <div id="popupContent"></div>
+                  <div id="markerContent">
+                    <h2 id="markerTitle">#</h2>
+                    <p id="markerCapital" class="lead d-none">Capital</p>
+                    <p id="markerSummary"></p>
+                    <p>
+                      <a
+                        href="#"
+                        id="markerLink"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >Wikipedia</a
+                      >
+                    </p>
+                    <div id="weather" class="d-none">
+                      <h3>Current Weather</h3>
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <td class="summary">
+                              <i id="summaryIcon" class="wi"></i>
+                              <span id="summaryText"></span>
+                            </td>
+                            <td>
+                              <span class="summary"
+                                ><span id="currentTemp"></span
+                                ><i class="wi wi-celsius"></i> </span
+                              ><span id="feels"
+                                >Feels like <span id="feelsLike"></span
+                                ><i class="wi wi-celsius"></i
+                              ></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <i class="wi wi-thermometer"></i>
+                              <span id="maxTemp"></span
+                              ><i class="wi wi-celsius"></i>
+                            </td>
+                            <td>
+                              <i class="wi wi-thermometer-exterior"></i>
+                              <span id="minTemp"></span
+                              ><i class="wi wi-celsius"></i>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <i class="wi wi-strong-wind"></i>
+                              <span id="windSpeed"></span> m/s
+                            </td>
+                            <td>
+                              <i id="windIcon" class="wi wi-wind"></i>
+                              <span id="windDir"></span>&#176;
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <i class="wi wi-humidity"></i>
+                              <span id="humidity"></span> %
+                            </td>
+                            <td>
+                              <i class="wi wi-barometer"></i>
+                              <span id="pressure"></span> hPa
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <i class="wi wi-sunrise"></i>
+                              <span id="sunrise"></span>
+                            </td>
+                            <td>
+                              <i class="wi wi-sunset"></i>
+                              <span id="sunset"></span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

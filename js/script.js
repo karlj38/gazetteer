@@ -51,64 +51,13 @@ function checkURLHash() {
   }
 }
 
-function convertTime(unix) {
-  const d = new Date(unix * 1000);
+function convertTime(unix, offset) {
+  const d = new Date((unix - offset) * 1000);
   let hours = d.getHours();
   hours = hours < 10 ? `0${hours}` : hours;
   let mins = d.getMinutes();
   mins = mins < 10 ? `0${mins}` : mins;
   return `${hours}:${mins}`;
-}
-
-function displayCountryInfo() {
-  let country = {};
-  const opencage = countryData.opencage;
-  const rest = countryData.rest;
-  country["Country Code"] = opencage.components.country_code;
-  country.Capital = rest.capital || null;
-  country.Continent = opencage.components.continent || null;
-  let population = rest.population || null;
-  if (population) {
-    country.Population = formatNumber(population);
-  }
-  let landArea = rest.area || null;
-  if (landArea) {
-    landArea = formatNumber(landArea);
-    country["Land Area"] = `${landArea} km<sup>2</sup>`;
-  }
-  const tz = opencage.annotations.timezone.short_name || null;
-  let offset = opencage.annotations.timezone.offset_string || null;
-  offset = offset ? `(${offset})` : null;
-  country["Time Zone"] = `${tz} ${offset}`;
-  callcode = opencage.annotations.callingcode || null;
-  country["Calling Code"] = callcode ? `+${callcode}` : null;
-  country["TLD"] = rest.topLevelDomain || null;
-  country.Demonym = rest.demonym || null;
-  const wiki = countryData.wiki || null;
-  country.Wikipedia = wiki
-    ? `<a href="${wiki}" target="_blank">Wikipedia</a>`
-    : null;
-  let langArr = [];
-  rest.languages.forEach((lang) => langArr.push(lang.name));
-  if (langArr.length > 1) {
-    country.Languages = langArr.join(", ");
-  } else {
-    country.Language = langArr[0];
-  }
-
-  const properties = Object.keys(country).sort();
-  let countryDetails = {};
-  properties.forEach((prop) => (countryDetails[prop] = country[prop]));
-  $("#countryName").html(
-    `${countryName} <img src="${rest.flag}" class="thumbnail alt="country flag">`
-  );
-  for (let key in countryDetails) {
-    if (countryDetails[key]) {
-      $("#infoTable").append(`<tr></tr>`);
-      $("#infoTable tr:last-child").append(`<th scope"row">${key}</th>`);
-      $("#infoTable tr:last-child").append(`<td >${countryDetails[key]}</td>`);
-    }
-  }
 }
 
 function displayBorders() {
@@ -138,6 +87,56 @@ function displayBorders() {
   L.DomEvent.disableClickPropagation($(window.borders).get(0));
 }
 
+function displayCountryInfo() {
+  const opencage = countryData.opencage;
+  const rest = countryData.rest;
+  let country = {};
+  callcode = opencage.annotations.callingcode || null;
+  country.callingCode = callcode ? `+${callcode}` : null;
+  country.capital = rest.capital || null;
+  country.continent = opencage.components.continent || null;
+  country.countryCode = opencage.components.country_code || null;
+  country.demonym = rest.demonym || null;
+  let landArea = rest.area || null;
+  if (landArea) {
+    landArea = formatNumber(landArea);
+    country.landArea = landArea;
+  }
+  let langArr = [];
+  rest.languages.forEach((lang) => langArr.push(lang.name));
+  if (langArr.length > 1) {
+    country.languages = langArr.join(", ");
+    country.language = null;
+  } else {
+    country.language = langArr[0];
+    country.languages = null;
+  }
+  let population = rest.population || null;
+  if (population) {
+    country.population = formatNumber(population);
+  }
+  country.tld = rest.topLevelDomain[0] || null;
+  const tz = opencage.annotations.timezone.short_name || null;
+  let offset = opencage.annotations.timezone.offset_string || null;
+  offset = offset ? `(${offset})` : null;
+  country.tz = `${tz} ${offset}`;
+
+  $("#countryName").text(countryName);
+  $("#countryFlag").attr("src", rest.flag);
+  for (let key in country) {
+    if (country[key]) {
+      $(`#${key}`).html(country[key]);
+      $(`#${key}Row`).show();
+    } else {
+      $(`#${key}Row`).hide();
+    }
+  }
+  country.wiki = countryData.wiki || null;
+  $("#wiki").attr("href", country.wiki);
+
+  displayMainCurrency();
+}
+
 function displayCities() {
   const data = countryData.cities;
   let cities = [];
@@ -155,21 +154,13 @@ function displayCities() {
       }
     );
 
-    let details = `<h2>${city.name}</h2>`;
-    if (city.name === countryData.rest.capital) {
-      details += `<p class="lead">Capital</p>`;
-    }
-    details += `<p>${city.snippet}</p>`;
-    if (city.wiki) {
-      details += `<p><a href="${city.wiki}" target="_blank">Wikipedia</a></p>`;
-    }
-    if (city.weather) {
-      details += weather(city.weather);
-    }
-
     cityMarker.on("click", function () {
-      $("#popupContent").html(details);
-      $("#popupModal").modal("toggle");
+      markerModal(city.name, city.snippet, city.wiki);
+      if (city.weather) {
+        weather(city.weather);
+      } else {
+        $("#weather").addClass("d-none");
+      }
     });
     cities.push(cityMarker);
   });
@@ -206,6 +197,27 @@ function displayCovid() {
   $("#covid-link").removeClass("d-none");
 }
 
+function displayMainCurrency() {
+  const currency = countryData.opencage.annotations.currency;
+  const symbol = currency.html_entity || currency.symbol || null;
+  const code = currency.iso_code || null;
+  const name = currency.name || null;
+  const sub = currency.subunit || null;
+  let units = null;
+  if (symbol && sub) {
+    units = `(${symbol} / ${sub})`;
+  } else if (symbol && !sub) {
+    units = `(${symbol})`;
+  } else if (!symbol && sub) {
+    units = `(${sub})`;
+  }
+  const flag =
+    currency.iso_code === "EUR" ? "svg\\Europe.svg" : countryData.rest.flag;
+  $("#countryCurrencyFlag").attr({ src: flag, alt: `${countryName} flag` });
+  $("#countryCurrencyCode").text(code);
+  $("#countryCurrency").html(`${name} ${units}`);
+}
+
 function displayMountains() {
   let mountains = [];
   const mountainIcon = L.ExtraMarkers.icon({
@@ -219,16 +231,12 @@ function displayMountains() {
       icon: mountainIcon,
       title: mountain.name,
     });
-    let details = `<h2>${mountain.name}</h2>`;
     let elevation = mountain.elevation || null;
     elevation = elevation ? elevation + " m" : "undefined";
-    details += `<p><strong>Elevation:</strong> ${elevation} </p>`;
-    if (mountain.wiki) {
-      details += `<p><a href="${mountain.wiki}" target="_blank">Wikipedia</a></p>`;
-    }
+    elevation = `<strong>Elevation:</strong> ${elevation} `;
+
     mountainMarker.on("click", function () {
-      $("#popupContent").html(details);
-      $("#popupModal").modal("toggle");
+      markerModal(mountain.name, elevation, mountain.wiki);
     });
     mountains.push(mountainMarker);
   });
@@ -251,14 +259,8 @@ function displayPOIs() {
         title: poi.name,
       }
     );
-    let details = `<h2>${poi.name}</h2>`;
-    details += `<p>${poi.snippet}</p>`;
-    if (poi.wiki) {
-      details += `<p><a href="${poi.wiki}" target="_blank">Wikipedia</a></p>`;
-    }
     poiMarker.on("click", function () {
-      $("#popupContent").html(details);
-      $("#popupModal").modal("toggle");
+      markerModal(poi.name, poi.snippet, poi.wiki);
     });
     pois.push(poiMarker);
   });
@@ -269,31 +271,19 @@ function displayRates() {
   const currency = countryData.opencage.annotations.currency;
   const symbol = currency.html_entity || currency.symbol || null;
   const code = currency.iso_code || null;
-  const name = currency.name || null;
-  const sub = currency.subunit || null;
-  let units = null;
-  if (symbol && sub) {
-    units = `(${symbol} / ${sub})`;
-  } else if (symbol && !sub) {
-    units = `(${symbol})`;
-  } else if (!symbol && sub) {
-    units = `(${sub})`;
-  }
-  const flag = code === "EUR" ? "svg\\Europe.svg" : countryData.rest.flag;
-  $("#countryCurrencyFlag").attr({ src: flag, alt: `${countryName} flag` });
-  $("#countryCurrencyCode").text(code);
-  $("#countryCurrency").html(`${name} ${units}`);
-
-  for (const currency in countryData.rates.rates) {
-    const rate = Number(countryData.rates.rates[currency]).toFixed(3);
-    const flag = countryData.rates.flags[currency];
-    $currency = $("<tr/>");
-    $currency.append(
-      `<td><img src='${flag}' class='currencyFlag' alt="${currency} flag"></td>`
-    );
-    $currency.append(`<th scope='row' class="">${currency}</th>`);
-    $currency.append(`<td class="w-50 text-right">${rate}</td>`);
-    $("#financeTable").append($currency);
+  const exchange = countryData.rates;
+  for (const ex in exchange.rates) {
+    const rate = Number(exchange.rates[ex]).toFixed(3);
+    const flag = exchange.flags[ex];
+    $(`#${ex}Flag`).attr({ src: flag, alt: ex + " flag" });
+    $(`#${ex}Code`).text(ex);
+    $(`#${ex}Rate`).text(rate);
+    $(`#${ex}Row`).removeClass("d-none");
+    $("#financeTable").removeClass("d-none");
+    $("#ratesError").addClass("d-none");
+    if (ex === code) {
+      $(`#${ex}Row`).addClass("d-none");
+    }
   }
 }
 
@@ -347,7 +337,8 @@ function getCountry({ countryName, lat, lng }) {
       if (data.rates || null) {
         displayRates();
       } else {
-        $("#ratesError").toggleClass("d-none");
+        $("#financeTable").addClass("d-none");
+        $("#ratesError").removeClass("d-none");
       }
       if (data.mountains || null) {
         displayMountains();
@@ -466,6 +457,24 @@ function init() {
     .disable();
 }
 
+function markerModal(title, summary, wiki) {
+  $("#markerTitle").text(title);
+  $("#markerSummary").html(summary);
+  if (title === countryData.rest.capital) {
+    $("#markerCapital").removeClass("d-none");
+  } else {
+    $("#markerCapital").addClass("d-none");
+  }
+  if (wiki) {
+    $("#markerLink").attr("href", wiki);
+    $("#markerLink").removeClass("d-none");
+  } else {
+    $("#markerLink").addClass("d-none");
+  }
+  $("#weather").addClass("d-none");
+  $("#markerModal").modal("toggle");
+}
+
 function onLocationError(e) {
   alert(e.message);
   $("#preloader").fadeOut();
@@ -493,8 +502,6 @@ function resetMap() {
   if (window.infoButton) {
     window.infoButton.disable();
   }
-  $("#infoTable").empty();
-  $("#financeTable").empty();
 }
 
 function validateCountry(country) {
@@ -509,51 +516,25 @@ function validateCountry(country) {
 }
 
 function weather(weather) {
-  const w = `
-  <h3>Current Weather</h3>
-    <table id="weather" class="table">
-      <tbody>
-      ${WeatherReport(weather)}
-      </tbody>
-    </table>`;
-  return w;
-}
-
-function WeatherReport(weather) {
-  const summaryIcon = `<i class="wi wi-owm-${weather.weather[0].id}"></i>`;
-  let summary = weather.weather[0].description;
-  summary = summary[0].toUpperCase() + summary.slice(1);
-  const currentTemp = Math.round(weather.main.temp);
-  const feels = Math.round(weather.main.feels_like);
-  const max = Math.round(weather.main.temp_max);
-  const min = Math.round(weather.main.temp_min);
-  const windDirIcon = `<i class = "wi wi-wind from-${weather.wind.deg}-deg"></i>`;
-  const windDir = weather.wind.deg;
-  const wind = Math.round(weather.wind.speed);
-  const pressure = weather.main.pressure;
-  const humidity = weather.main.humidity;
-  const sunrise = convertTime(weather.sys.sunrise);
-  const sunset = convertTime(weather.sys.sunset);
-  let $result = `
-  <tr>
-    <td class="summary">${summaryIcon} ${summary}</td>
-    <td ><span class="summary">${currentTemp}<i class = "wi wi-celsius"></i> </span>Feels like ${feels}<i class = "wi wi-celsius"></i></td>
-  </tr>
-  <tr>
-    <td><i class = "wi wi-thermometer"></i> ${max}<i class = "wi wi-celsius"></i></td>
-    <td><i class = "wi wi-thermometer-exterior"></i> ${min}<i class = "wi wi-celsius"></i></td>
-  </tr>
-  <tr>
-    <td><i class= "wi wi-strong-wind"></i> ${wind} m/s</td>
-    <td>${windDirIcon} ${windDir}&#176;</td>
-  </tr>
-  <tr>
-    <td><i class = "wi wi-humidity"></i> ${humidity} % </td>
-    <td><i class = "wi wi-barometer"></i> ${pressure} hPa</td>
-  </tr>
-  <tr>
-  <td><i class = "wi wi-sunrise"></i> ${sunrise}</td>
-  <td><i class = "wi wi-sunset"></i> ${sunset}</td>
-  </tr>`;
-  return $result;
+  $("#summaryIcon").attr("class", `wi wi-owm-${weather.weather[0].id}`);
+  $("#summaryText").text(weather.weather[0].description);
+  const current = Math.round(weather.main.temp);
+  const feel = Math.round(weather.main.feels_like);
+  $("#currentTemp").text(current);
+  if (current !== feel) {
+    $("#feelsLike").text(feel);
+    $("#feels").removeClass("d-none");
+  } else {
+    $("#feels").addClass("d-none");
+  }
+  $("#maxTemp").text(Math.round(weather.main.temp_max));
+  $("#minTemp").text(Math.round(weather.main.temp_min));
+  $("#windSpeed").text(Math.round(weather.wind.speed));
+  $("#windIcon").attr("class", `wi wi-wind from-${weather.wind.deg}-deg`);
+  $("#windDir").text(weather.wind.deg);
+  $("#humidity").text(weather.main.humidity);
+  $("#pressure").text(weather.main.pressure);
+  $("#sunrise").text(convertTime(weather.sys.sunrise, weather.timezone));
+  $("#sunset").text(convertTime(weather.sys.sunset, weather.timezone));
+  $("#weather").removeClass("d-none");
 }
