@@ -52,10 +52,10 @@ function checkURLHash() {
 }
 
 function convertTime(unix, offset) {
-  const d = new Date((unix - offset) * 1000);
-  let hours = d.getHours();
+  const d = new Date((unix + offset) * 1000);
+  let hours = d.getUTCHours();
   hours = hours < 10 ? `0${hours}` : hours;
-  let mins = d.getMinutes();
+  let mins = d.getUTCMinutes();
   mins = mins < 10 ? `0${mins}` : mins;
   return `${hours}:${mins}`;
 }
