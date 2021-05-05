@@ -26,7 +26,7 @@ function addCountryListControl() {
         '<select id="countryList" class="form-control leaflet-control leaflet-bar" onchange="validateCountry(this.value)"></select>'
       );
       $select.append(
-        '<option value="" disabled selected>Select a country</option>'
+        '<option value="" disabled selected hidden>Select a country</option>'
       );
       return $select.get(0);
     },
