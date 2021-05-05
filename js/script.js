@@ -7,9 +7,9 @@ window.map = L.map("map", {
   ],
   zoomControl: false,
 });
-window.cityMarkers = L.layerGroup();
-window.mountainMarkers = L.layerGroup();
-window.poiMarkers = L.layerGroup();
+window.cityMarkers = L.markerClusterGroup();
+window.mountainMarkers = L.markerClusterGroup();
+window.poiMarkers = L.markerClusterGroup();
 window.countryData = null;
 window.countryName = null;
 window.countryCode = null;
@@ -169,7 +169,10 @@ function displayCities() {
     });
     cities.push(cityMarker);
   });
-  window.cityMarkers = L.layerGroup(cities).addTo(map);
+  // window.cityMarkers = L.markerClusterGroup(cities).addTo(map);
+  window.cityMarkers = L.markerClusterGroup(cities);
+  map.addLayer(cityMarkers);
+  console.log(cityMarkers);
 }
 
 function displayCovid() {
@@ -250,7 +253,7 @@ function displayMountains() {
     });
     mountains.push(mountainMarker);
   });
-  window.mountainMarkers = L.layerGroup(mountains).addTo(map);
+  window.mountainMarkers = L.markerClusterGroup(mountains).addTo(map);
 }
 
 function displayPOIs() {
@@ -279,7 +282,7 @@ function displayPOIs() {
     });
     pois.push(poiMarker);
   });
-  window.poiMarkers = L.layerGroup(pois).addTo(map);
+  window.poiMarkers = L.markerClusterGroup(pois).addTo(map);
 }
 
 function displayRates() {
