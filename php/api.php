@@ -66,7 +66,7 @@ function getCurrencies($base)
     $ratesResult = curl($url);
     $ratesResult = json_decode($ratesResult);
     $flags = ["AUD" => "svg\Australia.svg", "CAD" => "svg\Canada.svg", "CHF" => "svg\Switzerland.svg", "CNY" => "svg\China.svg", "EUR" => "svg\Europe.svg", "GBP" => "svg\UK.svg", "HKD" => "svg\Hong_Kong.svg", "JPY" => "svg\Japan.svg", "USD" => "svg\USA.svg"];
-    if ($ratesResult->success) {
+    if ($ratesResult->success ?? null) {
         $ratesResult->flags = $flags;
         return $ratesResult;
     }
