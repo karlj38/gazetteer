@@ -323,8 +323,9 @@ function geocode(lat, lng) {
 }
 
 function getCountry({ countryName, lat, lng }) {
-  $("#preloader").fadeOut();
-  map.spin(true);
+  if ($("#preloader").is(":hidden")) {
+    map.spin(true);
+  }
   resetMap();
   let params = { get: "country" };
   if (countryName) {
@@ -371,6 +372,7 @@ function getCountry({ countryName, lat, lng }) {
       window.infoButton.enable();
     }
   }).then(function () {
+    $("#preloader").fadeOut();
     map.spin(false);
   });
 }
