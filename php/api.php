@@ -163,7 +163,7 @@ function openCage($search)
 
 function restCountry($code)
 {
-    $url = "https://restcountries.eu/rest/v2/alpha/$code";
+    $url = "https://restcountries.com/v2/alpha/$code";
     return curl($url);
 }
 
