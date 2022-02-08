@@ -121,9 +121,9 @@ function getCountry()
             $POIs = triposo($countryCode, "poi")->results ?? null;
             $output->POIs = $POIs;
 
-            $iso3Code = $borders->properties->iso_a3;
-            $covid = getCovid($iso3Code);
-            $output->covid = $covid;
+//             $iso3Code = $borders->properties->iso_a3;
+//             $covid = getCovid($iso3Code);
+//             $output->covid = $covid;
         }
         return json_encode($output);
     }
